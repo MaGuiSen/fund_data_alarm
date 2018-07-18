@@ -1,0 +1,53 @@
+version: '2.1'
+services:
+    postgres:
+        image: postgres:10.3
+        environment:
+            - TZ=Asia/Shanghai
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
+            - PGDATA=/var/lib/postgresql/data/pgdata
+        # volumes:
+            # - E:\soft_develop\docker\airflow\postgresql\data:/var/lib/postgresql/data/pgdata
+        ports:
+            - "6432:5432"
+
+    webserver:
+        image: puckel/docker-airflow:1.9.0-2
+        # restart: always
+        depends_on:
+            - postgres
+        environment:
+            - PYTHONPATH=/app/fund_data_alarm:$PYTHONPATH
+            - TZ=Asia/Shanghai
+            - LOAD_EX=n
+            - EXECUTOR=Local
+            - FERNET_KEY=SQQug5VCJCCm37-FfI7VqXXL_bs8oybqEfpyVEGa4YM=
+            # auth
+            - AIRFLOW__WEBSERVER__BASE_URL=http://192.168.0.186:8082
+            - AIRFLOW__WEBSERVER__AUTHENTICATE=FALSE
+            - AIRFLOW__WEBSERVER__AUTH_BACKEND=airflow.contrib.auth.backends.password_auth
+            # smtp
+            - AIRFLOW__SMTP__SMTP_HOST=smtp.exmail.qq.com
+            - AIRFLOW__SMTP__SMTP_STARTTLS=FALSE
+            - AIRFLOW__SMTP__SMTP_SSL=TRUE
+            - AIRFLOW__SMTP__SMTP_USER=1059876295@qq.com
+            - AIRFLOW__SMTP__SMTP_PASSWORD=Ma302508
+            - AIRFLOW__SMTP__SMTP_PORT=465
+            - AIRFLOW__SMTP__SMTP_MAIL_FROM=1059876295@qq.com
+
+        volumes:
+            - C:\gsma\pythonWorkSpace\componey\fund_data_alarm\requirements.txt:/requirements.txt
+            - C:\gsma\pythonWorkSpace\componey\fund_data_alarm:/app/fund_data_alarm
+            - C:\gsma\pythonWorkSpace\componey\fund_data_alarm\dags:/usr/local/airflow/dags
+            # Uncomment to include custom plugins
+            - C:\gsma\pythonWorkSpace\componey\fund_data_alarm\plugins:/usr/local/airflow/plugins
+        ports:
+            - "8082:8080"
+        command: webserver
+        healthcheck:
+            test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+            interval: 30s
+            timeout: 30s
+            retries: 3

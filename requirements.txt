@@ -1,0 +1,4 @@
+pymongo
+pypinyin
+apache-airflow
+flask_bcrypt

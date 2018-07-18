@@ -1,0 +1,1 @@
+docker-compose -f C:\gsma\pythonWorkSpace\componey\fund_data_alarm\docker-compose-LocalExecutor.yml up -d
